@@ -35,7 +35,12 @@ jobs:
         env:
           SWA_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_COAST_05465D903 }}
         run: |
-          swa deploy ./web/dist --env production --deployment-token "$SWA_TOKEN"
+          swa deploy ./web/dist \
+            --env production \
+            --deployment-token "$SWA_TOKEN" \
+            --api-location ./api \
+            --api-language node \
+            --api-version 18
 
   close_pr:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -45,3 +50,4 @@ jobs:
         env:
           SWA_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_COAST_05465D903 }}
         run: echo "Closing PR env is not needed for CLI deploys."
+
