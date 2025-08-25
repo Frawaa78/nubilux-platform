@@ -49,7 +49,7 @@ function App() {
         </p>
       </div>
 
-      {/* Viser API-status fra /api/status */}
+      {/* Her render vi status-boksen */}
       <ApiStatus />
 
       <p className="read-the-docs">
