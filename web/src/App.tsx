@@ -2,6 +2,32 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import { useEffect, useState } from "react";
+
+function ApiStatus() {
+  const [text, setText] = useState("Laster…");
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("/api/status", { cache: "no-store" });
+        if (!res.ok) throw new Error(String(res.status));
+        const data = await res.json();
+        const t = new Date(data.time).toLocaleTimeString();
+        setText(`${data.service} ✓ ${t}`);
+      } catch (e) {
+        setText("Feil: Får ikke kontakt med API");
+      }
+    })();
+  }, []);
+
+  return (
+    <div className="card" style={{ marginTop: 12 }}>
+      <h3>API status</h3>
+      <p>{text}</p>
+    </div>
+  );
+}
 
 function App() {
   const [count, setCount] = useState(0)
