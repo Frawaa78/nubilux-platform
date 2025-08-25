@@ -8,14 +8,12 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build_and_deploy_job:
+  build_and_deploy:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
-    name: Build And Deploy
+
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -30,22 +28,20 @@ jobs:
           npm ci
           npm run build
 
-      - name: Deploy to Azure Static Web Apps
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_COAST_05465D903 }}
-          action: upload
-          app_location: web
-          app_artifact_location: web/dist     # vi har allerede bygd
-          skip_app_build: true
+      - name: Install SWA CLI
+        run: npm i -g @azure/static-web-apps-cli
 
-  close_pull_request_job:
+      - name: Deploy with SWA CLI
+        env:
+          SWA_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_COAST_05465D903 }}
+        run: |
+          swa deploy ./web/dist --env production --deployment-token "$SWA_TOKEN"
+
+  close_pr:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
-    name: Close Pull Request Job
     steps:
-      - name: Close Pull Request
-        uses: Azure/static-web-apps-deploy@v1
-        with:
-          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_COAST_05465D903 }}
-          action: close
+      - name: Close PR env
+        env:
+          SWA_TOKEN: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_ZEALOUS_COAST_05465D903 }}
+        run: echo "Closing PR env is not needed for CLI deploys."
